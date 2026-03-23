@@ -1,6 +1,6 @@
 from pathlib import Path
+import json
 
-from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -13,7 +13,8 @@ class Settings(BaseSettings):
     app_env: str = "development"
     app_host: str = "0.0.0.0"
     app_port: int = 8000
-    cors_origins: list[str] = ["http://localhost:5173"]
+
+    cors_origins: str = '["http://localhost:5173"]'
 
     db_host: str = "localhost"
     db_port: int = 5432
@@ -28,12 +29,18 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    @field_validator("cors_origins", mode="before")
-    @classmethod
-    def parse_cors_origins(cls, value):
-        if isinstance(value, str):
-            return [origin.strip() for origin in value.split(",") if origin.strip()]
-        return value
+    @property
+    def parsed_cors_origins(self) -> list[str]:
+        value = self.cors_origins
+
+        try:
+            parsed = json.loads(value)
+            if isinstance(parsed, list):
+                return [str(origin).strip() for origin in parsed if str(origin).strip()]
+        except json.JSONDecodeError:
+            pass
+
+        return [origin.strip() for origin in value.split(",") if origin.strip()]
 
     @property
     def database_url(self) -> str:
