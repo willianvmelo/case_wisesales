@@ -1,84 +1,124 @@
 # Wise Sales - Mini E-commerce
 
-Projeto full stack desenvolvido para teste técnico.
+##  Descrição do Projeto
 
-## Stack
+Este projeto é uma aplicação full stack de e-commerce simplificado, desenvolvida como parte de um teste técnico.  
+A aplicação permite a navegação de produtos, adição ao carrinho e aplicação de cupons de desconto, com validações de estoque e cálculo de valores.
 
-Backend:
-- FastAPI
-- PostgreSQL
-- psycopg2
-- Alembic
-- Pytest
+O objetivo principal foi demonstrar boas práticas de arquitetura, organização de código, testes e uso de containers para execução simplificada.
 
-Frontend:
-- React + Vite
-- Context API
-- Axios
-- Tailwind
-- Vitest
+---
 
-## Funcionalidades
+##  Funcionalidades
 
 - Listagem de produtos
 - Filtro por categoria
-- Carrinho (add, update, remove)
-- Aplicação de cupons (percentual e fixo)
+- Carrinho de compras:
+  - Adicionar item
+  - Atualizar quantidade
+  - Remover item
+- Aplicação de cupons:
+  - Percentual
+  - Valor fixo
 - Validação de estoque
 - Cálculo de subtotal, desconto e total
+- API documentada (Swagger)
 
-## Como rodar (Docker)
+---
+
+## Tecnologias Utilizadas
+
+### Backend
+- **FastAPI** → alta performance, tipagem forte e documentação automática
+- **PostgreSQL** → banco relacional robusto
+- **psycopg2** → driver leve e eficiente
+- **Alembic** → controle de migrações
+- **Pytest** → testes automatizados
+
+### Frontend
+- **React + Vite** → desenvolvimento rápido e moderno
+- **Context API** → gerenciamento de estado global
+- **Axios** → comunicação com API
+- **TailwindCSS** → estilização rápida e consistente
+- **Vitest** → testes unitários
+
+### Infraestrutura
+- **Docker + Docker Compose** → padronização e facilidade de execução
+
+---
+
+## Como Executar o Projeto
+
+### Pré-requisitos
+- Docker
+- Docker Compose
+
+### Execução
 
 ```bash
 docker compose up --build
 ```
 
-Frontend: http://localhost:3000  
-Backend: http://localhost:8000  
-Docs: http://localhost:8000/docs
+### Acessos
 
-## Testes
-
-### Executando localmente
-
-#### Backend
-```bash
-cd backend
-pytest
-ruff check .
-```
-
-#### Frontend
-```bash
-cd frontend
-npm run test
-npm run lint
-```
+- Frontend: http://localhost:3000
+- Backend: http://localhost:8000
+- Docs da API: http://localhost:8000/docs
 
 ---
 
-### Executando via Docker
+## Testes
 
-#### Backend
+### Backend (via Docker)
 
 ```bash
 docker compose exec api pytest
 docker compose exec api ruff check .
 ```
 
----
-
-### Observação
-
-Os testes do frontend devem ser executados localmente, pois o container final utiliza Nginx apenas para servir a aplicação.
-
-Certifique-se de que os containers estão rodando:
+### Frontend (local)
 
 ```bash
-docker compose up -d
+cd frontend
+npm install
+npm run test
+npm run lint
 ```
 
-## Estrutura
+---
+
+## Decisões Técnicas
+
+- **Backend como fonte da verdade**  
+  Toda a lógica de cálculo (subtotal, desconto e total) está centralizada no backend para garantir consistência.
+
+- **Arquitetura em camadas (Controller → Service → Repository)**  
+  Facilita manutenção, testes e evolução do sistema.
+
+- **Uso de Docker**  
+  Elimina dependências locais e reduz fricção para execução do projeto.
+
+- **Tratamento flexível de CORS**  
+  Implementado parsing para aceitar múltiplos formatos de configuração, evitando erros comuns em ambiente Docker.
+
+- **Estado global no frontend com Context API**  
+  Simples e suficiente para o escopo do projeto, evitando complexidade desnecessária.
+
+---
+
+## O que faria diferente com mais tempo
+
+- Implementar autenticação (JWT)
+- Persistência de carrinho por usuário
+- Testes E2E (ex: Cypress ou Playwright)
+- Melhorar UX/UI (loading states, feedbacks)
+- Paginação e busca de produtos
+- Observabilidade (logs estruturados e métricas)
+- Deploy em ambiente cloud (ex: AWS, Vercel)
+
+---
+
+##  Estrutura do Projeto
 
 ```
 backend/
@@ -87,14 +127,6 @@ docker-compose.yml
 seed.sql
 ```
 
-## Observações
+---
 
-- Backend é fonte da verdade para cálculos
-- Projeto estruturado em camadas
-- Frontend usa estado global com Context
 
-## Melhorias futuras
-
-- autenticação
-- persistência de carrinho por usuário
-- testes E2E
