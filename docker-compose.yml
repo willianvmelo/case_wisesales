@@ -11,6 +11,31 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./seed.sql:/docker-entrypoint-initdb.d/seed.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-wisesales} -d ${DB_NAME:-wisesales}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      APP_NAME: Wise Sales API
+      APP_ENV: development
+      APP_HOST: 0.0.0.0
+      APP_PORT: 8000
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-wisesales}
+      DB_USER: ${DB_USER:-wisesales}
+      DB_PASSWORD: ${DB_PASSWORD:-wisesales123}
 
 volumes:
   pgdata:
