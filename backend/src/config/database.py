@@ -1,6 +1,5 @@
 from contextlib import contextmanager
 
-import psycopg2
 from psycopg2.pool import SimpleConnectionPool
 
 from src.config.settings import settings
