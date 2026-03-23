@@ -38,12 +38,13 @@ class CouponRepository:
                 row = cursor.fetchone()
                 return dict(row) if row else None
 
-    def clear_applied_coupon(self) -> None:
+    def clear_applied_coupon(self) -> int:
         query = "DELETE FROM cart_coupon;"
 
         with get_db_connection() as connection:
             with connection.cursor() as cursor:
                 cursor.execute(query)
+                return cursor.rowcount
 
     def apply_coupon(self, coupon_id: int) -> None:
         query = """

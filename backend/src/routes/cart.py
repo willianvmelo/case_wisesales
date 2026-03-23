@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, status
 
 from src.schemas.cart import (
     AddCartItemRequest,
@@ -18,7 +18,7 @@ def get_cart():
     return cart_service.get_cart()
 
 
-@router.post("/items", response_model=CartResponse)
+@router.post("/items", response_model=CartResponse, status_code=status.HTTP_201_CREATED)
 def add_cart_item(payload: AddCartItemRequest):
     return cart_service.add_item(
         product_id=payload.product_id,
@@ -36,6 +36,11 @@ def delete_cart_item(item_id: int):
     return cart_service.remove_item(item_id=item_id)
 
 
-@router.post("/coupon", response_model=CartResponse)
+@router.post("/coupon", response_model=CartResponse, status_code=status.HTTP_201_CREATED)
 def apply_coupon(payload: ApplyCouponRequest):
     return cart_service.apply_coupon(code=payload.code)
+
+
+@router.delete("/coupon", response_model=CartResponse)
+def remove_coupon():
+    return cart_service.remove_coupon()

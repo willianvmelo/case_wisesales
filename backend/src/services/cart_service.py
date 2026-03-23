@@ -30,10 +30,7 @@ class CartService:
         else:
             discount = discount_value
 
-        if discount > subtotal:
-            return subtotal
-
-        return discount
+        return min(discount, subtotal)
 
     def _build_cart_response(self) -> dict:
         items = self.cart_repository.list_cart_items()
@@ -143,4 +140,12 @@ class CartService:
         self.coupon_repository.clear_applied_coupon()
         self.coupon_repository.apply_coupon(coupon["id"])
 
+        return self._build_cart_response()
+
+    def remove_coupon(self) -> dict:
+        applied_coupon = self.coupon_repository.get_applied_coupon()
+        if not applied_coupon:
+            raise AppException("No coupon applied to cart", status_code=404)
+
+        self.coupon_repository.clear_applied_coupon()
         return self._build_cart_response()

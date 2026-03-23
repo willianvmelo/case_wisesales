@@ -24,7 +24,7 @@ def test_add_cart_item_should_add_new_item():
         json={"product_id": 1, "quantity": 2},
     )
 
-    assert response.status_code == 200
+    assert response.status_code == 201
     data = response.json()
 
     assert len(data["items"]) >= 1
@@ -93,7 +93,7 @@ def test_apply_percentage_coupon_should_return_discounted_total():
         json={"code": "DESCONTO10"},
     )
 
-    assert response.status_code == 200
+    assert response.status_code == 201
     data = response.json()
 
     assert data["coupon"]["code"] == "DESCONTO10"
@@ -110,7 +110,7 @@ def test_apply_fixed_coupon_should_not_make_total_negative():
         json={"code": "VALE15"},
     )
 
-    assert response.status_code == 200
+    assert response.status_code == 201
     data = response.json()
 
     assert data["coupon"]["code"] == "VALE15"
@@ -137,3 +137,23 @@ def test_apply_invalid_coupon_should_return_404():
 
     assert response.status_code == 404
     assert response.json() == {"detail": "Coupon not found"}
+
+
+def test_remove_coupon_should_clear_applied_coupon():
+    client.post("/cart/items", json={"product_id": 1, "quantity": 1})
+    client.post("/cart/coupon", json={"code": "DESCONTO10"})
+
+    response = client.delete("/cart/coupon")
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert data["coupon"] is None
+    assert float(data["discount"]) == 0.0
+
+
+def test_remove_coupon_should_return_404_when_none_is_applied():
+    response = client.delete("/cart/coupon")
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "No coupon applied to cart"}
