@@ -51,6 +51,44 @@ export function CartProvider({ children }) {
     }
   }
 
+  async function updateItem(itemId, quantity) {
+    try {
+      dispatch({ type: "CART_REQUEST" });
+
+      const response = await api.patch(`/cart/items/${itemId}`, {
+        quantity,
+      });
+
+      dispatch({
+        type: "CART_SUCCESS",
+        payload: response.data,
+      });
+    } catch (error) {
+      dispatch({
+        type: "CART_FAILURE",
+        payload: getErrorMessage(error, "Não foi possível atualizar o item."),
+      });
+    }
+  }
+
+  async function removeItem(itemId) {
+    try {
+      dispatch({ type: "CART_REQUEST" });
+
+      const response = await api.delete(`/cart/items/${itemId}`);
+
+      dispatch({
+        type: "CART_SUCCESS",
+        payload: response.data,
+      });
+    } catch (error) {
+      dispatch({
+        type: "CART_FAILURE",
+        payload: getErrorMessage(error, "Não foi possível remover o item."),
+      });
+    }
+  }
+
   function clearError() {
     dispatch({ type: "CLEAR_CART_ERROR" });
   }
@@ -70,6 +108,8 @@ export function CartProvider({ children }) {
       itemCount,
       fetchCart,
       addItem,
+      updateItem,
+      removeItem,
       clearError,
     }),
     [state, itemCount],
