@@ -1,9 +1,8 @@
-import { createContext, useEffect, useMemo, useReducer, useState } from "react";
+import { useEffect, useMemo, useReducer, useState } from "react";
 
 import api from "../api/client";
+import { CartContext } from "./cartContext";
 import { cartReducer, initialCartState } from "./cartReducer";
-
-export const CartContext = createContext(null);
 
 function getErrorMessage(error, fallbackMessage) {
   return error?.response?.data?.detail || fallbackMessage;

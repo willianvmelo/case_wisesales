@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import useCart from "../../hooks/useCart";
 
@@ -12,11 +12,7 @@ function CartCouponForm() {
     clearError,
   } = useCart();
 
-  const [code, setCode] = useState("");
-
-  useEffect(() => {
-    setCode(coupon?.code || "");
-  }, [coupon]);
+  const [code, setCode] = useState(coupon?.code || "");
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -29,11 +25,13 @@ function CartCouponForm() {
 
     clearError();
     await applyCoupon(normalizedCode);
+    setCode(normalizedCode);
   }
 
   async function handleRemoveCoupon() {
     clearError();
     await removeCoupon();
+    setCode("");
   }
 
   const isCartEmpty = items.length === 0;
