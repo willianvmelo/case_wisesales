@@ -83,3 +83,57 @@ def test_delete_cart_item_should_remove_item():
     data = response.json()
 
     assert all(item["id"] != item_id for item in data["items"])
+
+
+def test_apply_percentage_coupon_should_return_discounted_total():
+    client.post("/cart/items", json={"product_id": 1, "quantity": 2})
+
+    response = client.post(
+        "/cart/coupon",
+        json={"code": "DESCONTO10"},
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert data["coupon"]["code"] == "DESCONTO10"
+    assert float(data["subtotal"]) == 99.8
+    assert float(data["discount"]) == 9.98
+    assert float(data["total"]) == 89.82
+
+
+def test_apply_fixed_coupon_should_not_make_total_negative():
+    client.post("/cart/items", json={"product_id": 5, "quantity": 1})
+
+    response = client.post(
+        "/cart/coupon",
+        json={"code": "VALE15"},
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert data["coupon"]["code"] == "VALE15"
+    assert float(data["subtotal"]) == 39.9
+    assert float(data["discount"]) == 15.0
+    assert float(data["total"]) == 24.9
+
+
+def test_apply_expired_coupon_should_return_409():
+    response = client.post(
+        "/cart/coupon",
+        json={"code": "EXPIRADO20"},
+    )
+
+    assert response.status_code == 409
+    assert response.json() == {"detail": "Coupon is expired"}
+
+
+def test_apply_invalid_coupon_should_return_404():
+    response = client.post(
+        "/cart/coupon",
+        json={"code": "NAOEXISTE"},
+    )
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Coupon not found"}

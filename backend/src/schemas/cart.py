@@ -12,6 +12,10 @@ class UpdateCartItemRequest(BaseModel):
     quantity: int = Field(gt=0)
 
 
+class ApplyCouponRequest(BaseModel):
+    code: str
+
+
 class AppliedCouponResponse(BaseModel):
     code: str
     discount_type: str

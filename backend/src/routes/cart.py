@@ -1,6 +1,11 @@
 from fastapi import APIRouter
 
-from src.schemas.cart import AddCartItemRequest, CartResponse, UpdateCartItemRequest
+from src.schemas.cart import (
+    AddCartItemRequest,
+    ApplyCouponRequest,
+    CartResponse,
+    UpdateCartItemRequest,
+)
 from src.services.cart_service import CartService
 
 router = APIRouter(prefix="/cart", tags=["cart"])
@@ -29,3 +34,8 @@ def update_cart_item(item_id: int, payload: UpdateCartItemRequest):
 @router.delete("/items/{item_id}", response_model=CartResponse)
 def delete_cart_item(item_id: int):
     return cart_service.remove_item(item_id=item_id)
+
+
+@router.post("/coupon", response_model=CartResponse)
+def apply_coupon(payload: ApplyCouponRequest):
+    return cart_service.apply_coupon(code=payload.code)
