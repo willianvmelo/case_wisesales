@@ -1,3 +1,5 @@
+import useCart from "../../hooks/useCart";
+
 function formatCurrency(value) {
   return new Intl.NumberFormat("pt-BR", {
     style: "currency",
@@ -6,7 +8,12 @@ function formatCurrency(value) {
 }
 
 function ProductCard({ product }) {
+  const { addItem, isLoading } = useCart();
   const isOutOfStock = product.stock === 0;
+
+  async function handleAddToCart() {
+    await addItem(product.id, 1);
+  }
 
   return (
     <article className="flex h-full flex-col rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
@@ -48,14 +55,15 @@ function ProductCard({ product }) {
 
           <button
             type="button"
-            disabled={isOutOfStock}
+            onClick={handleAddToCart}
+            disabled={isOutOfStock || isLoading}
             className={`w-full rounded-xl px-4 py-2.5 text-sm font-medium transition-colors ${
-              isOutOfStock
+              isOutOfStock || isLoading
                 ? "cursor-not-allowed bg-zinc-200 text-zinc-500"
                 : "bg-zinc-900 text-white hover:bg-zinc-800"
             }`}
           >
-            Adicionar ao carrinho
+            {isLoading ? "Adicionando..." : "Adicionar ao carrinho"}
           </button>
         </div>
       </div>

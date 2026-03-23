@@ -1,6 +1,10 @@
 import { Link, NavLink, Outlet } from "react-router-dom";
 
+import useCart from "../../hooks/useCart";
+
 function AppLayout() {
+  const { itemCount } = useCart();
+
   const baseLinkClass =
     "rounded-md px-3 py-2 text-sm font-medium transition-colors";
   const getNavClass = ({ isActive }) =>
@@ -22,6 +26,9 @@ function AppLayout() {
             </NavLink>
             <NavLink to="/cart" className={getNavClass}>
               Carrinho
+              <span className="ml-2 rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-white">
+                {itemCount}
+              </span>
             </NavLink>
           </nav>
         </div>
