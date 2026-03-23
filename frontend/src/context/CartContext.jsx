@@ -1,4 +1,4 @@
-import { createContext, useEffect, useMemo, useReducer } from "react";
+import { createContext, useEffect, useMemo, useReducer, useState } from "react";
 
 import api from "../api/client";
 import { cartReducer, initialCartState } from "./cartReducer";
@@ -11,6 +11,7 @@ function getErrorMessage(error, fallbackMessage) {
 
 export function CartProvider({ children }) {
   const [state, dispatch] = useReducer(cartReducer, initialCartState);
+  const [isCouponLoading, setIsCouponLoading] = useState(false);
 
   async function fetchCart() {
     try {
@@ -89,6 +90,48 @@ export function CartProvider({ children }) {
     }
   }
 
+  async function applyCoupon(code) {
+    try {
+      setIsCouponLoading(true);
+      dispatch({ type: "CLEAR_CART_ERROR" });
+
+      const response = await api.post("/cart/coupon", { code });
+
+      dispatch({
+        type: "CART_SUCCESS",
+        payload: response.data,
+      });
+    } catch (error) {
+      dispatch({
+        type: "CART_FAILURE",
+        payload: getErrorMessage(error, "Não foi possível aplicar o cupom."),
+      });
+    } finally {
+      setIsCouponLoading(false);
+    }
+  }
+
+  async function removeCoupon() {
+    try {
+      setIsCouponLoading(true);
+      dispatch({ type: "CLEAR_CART_ERROR" });
+
+      const response = await api.delete("/cart/coupon");
+
+      dispatch({
+        type: "CART_SUCCESS",
+        payload: response.data,
+      });
+    } catch (error) {
+      dispatch({
+        type: "CART_FAILURE",
+        payload: getErrorMessage(error, "Não foi possível remover o cupom."),
+      });
+    } finally {
+      setIsCouponLoading(false);
+    }
+  }
+
   function clearError() {
     dispatch({ type: "CLEAR_CART_ERROR" });
   }
@@ -106,13 +149,16 @@ export function CartProvider({ children }) {
     () => ({
       ...state,
       itemCount,
+      isCouponLoading,
       fetchCart,
       addItem,
       updateItem,
       removeItem,
+      applyCoupon,
+      removeCoupon,
       clearError,
     }),
-    [state, itemCount],
+    [state, itemCount, isCouponLoading],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
